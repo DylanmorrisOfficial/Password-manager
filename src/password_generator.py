@@ -8,15 +8,14 @@ def generate_password(length=16):
         raise ValueError("Password length should be at least 8 characters.")
 
     alphabet = string.ascii_letters + string.digits + string.punctuation
-    password = "".join(secrets.choice(alphabet) for _ in range(length))
 
-    if (
-        password.count(string.ascii_lowercase) == 0
-        or password.count(string.ascii_uppercase) == 0
-        or password.count(string.digits) == 0
-        or password.count(string.punctuation) == 0
-    ):
-        # Generate a new password the password does not contain all character types
-        return generate_password(length)
+    while True:
+        password = "".join(secrets.choice(alphabet) for _ in range(length))
 
-    return password
+        has_lower = any(c.islower() for c in password)
+        has_upper = any(c.isupper() for c in password)
+        has_digit = any(c.isdigit() for c in password)
+        has_symbol = any(c in string.punctuation for c in password)
+
+        if has_lower and has_upper and has_digit and has_symbol:
+            return password

@@ -1,3 +1,7 @@
+import json
+from models import PasswordEntry
+
+
 class Vault:
     def __init__(self):
         self.entries = []
@@ -20,3 +24,21 @@ class Vault:
     def list_entries(self):
         # Return a list of all entries in the vault
         return self.entries
+
+    def save_to_file(self, filename="vault.json"):
+        # Save entries to a JSON file
+        data = [entry.to_dict() for entry in self.entries]
+
+        with open(filename, "w") as file:
+            json.dump(data, file, indent=4)
+
+    def load_from_file(self, filename="vault.json"):
+        # Load entries from a JSON file
+        try:
+            with open(filename, "r") as file:
+                data = json.load(file)
+
+                self.entries = [PasswordEntry.from_dict(entry) for entry in data]
+
+        except FileNotFoundError:
+            self.entries = []
