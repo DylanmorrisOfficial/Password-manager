@@ -1,10 +1,17 @@
 import json
 from models import PasswordEntry
+from crypto_utils import encrypt, decrypt, get_key, save_key, load_key
 
 
 class Vault:
     def __init__(self):
         self.entries = []
+
+        if not load_key():
+            key = get_key()
+            save_key(key)
+
+        self.key = load_key()
 
     def add_entry(self, entry):
         # Adds a new entry to entries
@@ -25,20 +32,29 @@ class Vault:
         # Return a list of all entries in the vault
         return self.entries
 
-    def save_to_file(self, filename="vault.json"):
+    def save_to_file(self, filename="vault.dat"):
         # Save entries to a JSON file
         data = [entry.to_dict() for entry in self.entries]
 
-        with open(filename, "w") as file:
-            json.dump(data, file, indent=4)
+        json_data = json.dumps(data).encode()
 
-    def load_from_file(self, filename="vault.json"):
-        # Load entries from a JSON file
+        encrypted = encrypt(json_data, self.key)
+
+        with open(filename, "wb") as file:
+            file.write(encrypted)
+
+    def load_from_file(self, filename="vault.dat"):
         try:
-            with open(filename, "r") as file:
-                data = json.load(file)
+            with open(filename, "rb") as file:
+                encrypted_data = file.read()
 
-                self.entries = [PasswordEntry.from_dict(entry) for entry in data]
+            decrypted = decrypt(encrypted_data, self.key)
+
+            json_data = decrypted.decode()
+
+            data = json.loads(json_data)
+
+            self.entries = [PasswordEntry.from_dict(entry) for entry in data]
 
         except FileNotFoundError:
             self.entries = []

@@ -9,6 +9,7 @@ def generate_password(length=16):
 
     alphabet = string.ascii_letters + string.digits + string.punctuation
 
+    # Generates a password that includes at least one lowercase, uppercase, digit, and symbol
     while True:
         password = "".join(secrets.choice(alphabet) for _ in range(length))
 

@@ -1,7 +1,30 @@
 # Byte-compiled / optimized / DLL files
+# Python cache
 __pycache__/
 *.py[codz]
 *$py.class
+
+# Virtual environment
+venv/
+
+# Environment variables
+.env
+
+# Vault files
+vault.json
+vault.dat
+
+# Key files
+key.key
+
+# VS Code settings
+.vscode/
+
+# Pytest cache
+.pytest_cache/
+
+# macOS
+.DS_Store
 
 # C extensions
 *.so

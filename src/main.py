@@ -103,6 +103,7 @@ class Main:
         print("-------------------")
         print(f"Username: {entry.username}")
         print(f"Password: {entry.password}")
+        print(f"Notes: {entry.notes}")
         print("===================")
 
     def generate_random_password(self):
