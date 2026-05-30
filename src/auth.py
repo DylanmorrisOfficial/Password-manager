@@ -2,6 +2,7 @@ import hashlib
 import secrets
 import json
 import os
+import getpass
 
 
 def generate_salt():
@@ -35,4 +36,36 @@ def create_master_password():
     hashed_password = hash_password(password, salt)
 
     save_auth_data(username, salt, hashed_password)
-    print("Master password created successfully")
+    print("Password created")
+
+
+def auth_exists():
+    # Checks if the authentication data file exists
+    return os.path.exists("auth_data.json")
+
+
+def load_auth_data():
+    # Loads the authentication data from the JSON file
+    with open("auth_data.json", "r") as file:
+        return json.load(file)
+
+
+def verify_password(password):
+    # loads the authentication data
+    auth_data = load_auth_data()
+
+    # Extracts salt and stored hash from the authentication data
+    salt = auth_data["salt"]
+    stored_hash = auth_data["hashed_password"]
+
+    # Hashes the entered password with the stored salt and compares it to the stored hash
+    entered_hash = hash_password(password, salt)
+
+    return entered_hash == stored_hash
+
+
+def login():
+    # Prompts user for master password and verifies it against stored authentication data
+    password = getpass.getpass("Master password: ")
+
+    return verify_password(password)

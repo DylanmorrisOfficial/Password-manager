@@ -7,11 +7,14 @@ class Vault:
     def __init__(self):
         self.entries = []
 
-        if not load_key():
+        key = load_key()
+
+        if not key:
+            # Generates a new key and save it if no key is found
             key = get_key()
             save_key(key)
 
-        self.key = load_key()
+        self.key = key
 
     def add_entry(self, entry):
         # Adds a new entry to entries
@@ -29,11 +32,11 @@ class Vault:
         return None
 
     def list_entries(self):
-        # Return a list of all entries in the vault
+        # Returns a list of all entries in the vault
         return self.entries
 
     def save_to_file(self, filename="vault.dat"):
-        # Save entries to a JSON file
+        # Saves the vault entries to a file in encrypted format
         data = [entry.to_dict() for entry in self.entries]
 
         json_data = json.dumps(data).encode()
@@ -44,6 +47,7 @@ class Vault:
             file.write(encrypted)
 
     def load_from_file(self, filename="vault.dat"):
+        # Loads vault entries from a file, decrypting the data and populating entries
         try:
             with open(filename, "rb") as file:
                 encrypted_data = file.read()
@@ -57,4 +61,5 @@ class Vault:
             self.entries = [PasswordEntry.from_dict(entry) for entry in data]
 
         except FileNotFoundError:
+            # Starts with an empty vault if file does not exist
             self.entries = []

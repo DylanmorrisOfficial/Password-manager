@@ -1,5 +1,6 @@
 import vault
 import models
+import auth
 
 
 class Main:
@@ -8,6 +9,8 @@ class Main:
         self.vault.load_from_file()
 
     def run_menu(self):
+        self.login()
+
         # Main loop for menu options
         while True:
             print("--- Menu ---")
@@ -40,11 +43,11 @@ class Main:
                 print("Invalid option")
 
     def add_entry(self):
-        # Prompt user for entry details and add to vault
+        # Prompts user for entry details and add to vault
         service = self.get_non_empty("Enter service name: ")
         username = self.get_non_empty("Enter username: ")
 
-        # Ask user if they want to use a random password or enter their own
+        # Asks user if they want to use a random password or enter their own
         use_random_password = input("Use random password? (y/n): ").lower() == "y"
         if use_random_password:
             # Generates a random password using the password generator
@@ -61,30 +64,30 @@ class Main:
         print(f"Entry for {service} added successfully")
 
     def delete_entry(self):
-        # Prompt user for service name and delete entry from vault
+        # Prompts user for service name and delete entry from vault
         service = input("Enter service name: ")
         self.vault.remove_entry(service)
         print(f"Entry for {service} deleted successfully")
 
     def get_entry(self):
-        # Prompt user for service name and display entry details
+        # Prompts user for service name and display entry details
         service = input("Enter service name: ")
 
         entry = self.vault.get_entry(service)
         if entry:
             self.print_entry(entry)
         else:
-            # Print message if entry not found
+            # Prints message if entry not found
             print("Entry not found")
 
     def list_entries(self):
-        # List all entries in the vault
+        # Lists all entries in the vault
         entries = self.vault.list_entries()
         if entries:
             for entry in entries:
                 print(f"Service: {entry.service}, Username: {entry.username}")
         else:
-            # Print message if no entries found
+            # Prints message if no entries found
             print("No entries found")
 
     # Helper method to get non-empty input from user
@@ -96,21 +99,50 @@ class Main:
             else:
                 return value
 
-    # Prints entries in a formatted way
     def print_entry(self, entry):
+        # Prints entry details with password hidden, then prompts user if they want to reveal the password
+        self._print(entry, revealed=False)
+
+        choice = input("Reveal password? (y/n): ").lower()
+
+        if choice == "y":
+            self._print(entry, revealed=True)
+
+        return
+
+    def _print(self, entry, revealed):
+        # Helper method to print entry details, showing password if revealed is True
         print("\n===================")
         print(entry.service.upper())
         print("-------------------")
         print(f"Username: {entry.username}")
-        print(f"Password: {entry.password}")
+
+        if revealed:
+            print(f"Password: {entry.password}")
+        else:
+            print(f"Password: {'*' * len(entry.password)}")
+
         print(f"Notes: {entry.notes}")
         print("===================")
 
     def generate_random_password(self):
-        # Generate a random password using the password generator
+        # Generates a random password using the password generator
         from password_generator import generate_password
 
         return generate_password()
+
+    def login(self):
+        # Checks if authentication data exists, prompts user to create master password if not found
+        if not auth.auth_exists():
+            print("No master password found.")
+            auth.create_master_password()
+        else:
+            print("Login required.")
+
+        # Prompts user for master password and verifies it
+        if not auth.login():
+            print("Incorrect password.")
+            exit()
 
 
 # Main entry point

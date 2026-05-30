@@ -18,7 +18,7 @@ def load_key():
 
 
 def get_key():
-    # Try to load existing key, if not found, generate a new one and save it
+    # Tries to load existing key file or generates a new key if file not found
     try:
         return load_key()
     except FileNotFoundError:
