@@ -13,7 +13,7 @@ class Main:
 
         # Main loop for menu options
         while True:
-            print("--- Menu ---")
+            print("\n--- Menu ---")
             print("1. Add entry")
             print("2. Delete entry")
             print("3. Get entry")
@@ -139,10 +139,13 @@ class Main:
         else:
             print("Login required.")
 
-        # Prompts user for master password and verifies it
-        if not auth.login():
-            print("Incorrect password.")
-            exit()
+        # keep looping until correct password
+        while True:
+            if auth.login():
+                print("Login successful!")
+                return  # exit function when success
+            else:
+                print("Incorrect username or password. Try again.\n")
 
 
 # Main entry point
