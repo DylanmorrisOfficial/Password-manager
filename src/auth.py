@@ -21,8 +21,10 @@ def hash_password(password, salt):
 
 
 def save_auth_data(username, salt, hashed_password):
-    # Saves the authentication data to a JSON file
-    auth_data = {"username": username, "salt": salt, "hashed_password": hashed_password}
+    # Loads existing authentication data, updates it with the new username, salt, and hashed password, and saves it back to the JSON file
+    auth_data = load_auth_data()
+
+    auth_data[username] = {"salt": salt, "hashed_password": hashed_password}
 
     with open("auth_data.json", "w") as file:
         json.dump(auth_data, file)
@@ -31,6 +33,13 @@ def save_auth_data(username, salt, hashed_password):
 def create_master_password():
     # Prompts user to create a master password and saves the authentication data
     username = input("Create a username: ")
+
+    auth_data = load_auth_data()
+
+    if username in auth_data:
+        print("Username already exists. Please choose a different username.")
+        return
+
     password = confirm_password()
 
     salt = generate_salt()
@@ -45,31 +54,29 @@ def auth_exists():
 
 
 def load_auth_data():
-    # Loads the authentication data from the JSON file
+    # Loads the authentication data from the JSON file, returns an empty dictionary if file not found
+    if not os.path.exists("auth_data.json"):
+        return {}
+
     with open("auth_data.json", "r") as file:
         return json.load(file)
 
 
-def verify_password(password):
-    # loads the authentication data
+def verify_password(username, password):
+    # Loads the authentication data, checks if the username exists, and verifies the entered password by hashing it with the stored salt and comparing it to the stored hash
     auth_data = load_auth_data()
 
-    # Extracts salt and stored hash from the authentication data
-    salt = auth_data["salt"]
-    stored_hash = auth_data["hashed_password"]
+    if username not in auth_data:
+        return False
+
+    # Extracts salt and stored hash from the authentication data for the given username
+    salt = auth_data[username]["salt"]
+    stored_hash = auth_data[username]["hashed_password"]
 
     # Hashes the entered password with the stored salt and compares it to the stored hash
     entered_hash = hash_password(password, salt)
 
     return entered_hash == stored_hash
-
-
-def verify_username(username):
-    # Loads the authentication data and compares the entered username to the stored username
-    auth_data = load_auth_data()
-    stored_username = auth_data["username"]
-
-    return username == stored_username
 
 
 def confirm_password():
@@ -122,8 +129,8 @@ def login():
     username = input("\nEnter username: ")
     password = getpass.getpass("Enter password: ")
 
-    # Verifies the entered username and password, returns True if both are correct, otherwise returns False
-    if verify_username(username) and verify_password(password):
+    # Verifies the entered username and password, returns True if authentication is successful, otherwise returns False
+    if verify_password(username, password):
         return True
     else:
         return False

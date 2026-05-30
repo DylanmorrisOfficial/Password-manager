@@ -132,20 +132,35 @@ class Main:
         return generate_password()
 
     def login(self):
-        # Checks if authentication data exists, prompts user to create master password if not found
+        # Checks if authentication data exists, if not, prompts user to create a master password, otherwise prompts user to login
         if not auth.auth_exists():
-            print("No master password found.")
+            print("No users found.")
             auth.create_master_password()
         else:
             print("Login required.")
 
-        # keep looping until correct password
+        # Main loop for login attempts, prompts user to choose between login or creating a new user, if login is successful, breaks the loop, otherwise prompts user to try again
         while True:
-            if auth.login():
-                print("Login successful!")
-                return  # exit function when success
+            print("\n1. Login")
+            print("2. Create new user")
+
+            choice = input("Choose an option: ")
+
+            if choice == "2":
+                # Prompts user to create a new user and save authentication data
+                auth.create_master_password()
+                print("User created.\n")
+
+            elif choice == "1":
+                # Prompts user for username and password, verifies credentials, if successful, breaks the loop, otherwise prompts user to try again
+                if auth.login():
+                    print("Login successful!")
+                    return
+                else:
+                    # Prints message if login failed and prompts user to try again
+                    print("Incorrect username or password. Try again.\n")
             else:
-                print("Incorrect username or password. Try again.\n")
+                print("Invalid option")
 
 
 # Main entry point
