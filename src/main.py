@@ -5,11 +5,14 @@ import auth
 
 class Main:
     def __init__(self):
-        self.vault = vault.Vault()
-        self.vault.load_from_file()
+        self.vault = None
+        self.current_user = None
 
     def run_menu(self):
-        self.login()
+        self.current_user = self.login()
+
+        self.vault = vault.Vault(self.current_user)
+        self.vault.load_from_file()
 
         # Main loop for menu options
         while True:
@@ -152,10 +155,12 @@ class Main:
                 print("User created.\n")
 
             elif choice == "1":
-                # Prompts user for username and password, verifies credentials, if successful, breaks the loop, otherwise prompts user to try again
-                if auth.login():
+                # Prompts user for username and password, verifies credentials, if login is successful, returns the username, otherwise prints message and prompts user to try again
+                username = auth.login()
+
+                if username:
                     print("Login successful!")
-                    return
+                    return username
                 else:
                     # Prints message if login failed and prompts user to try again
                     print("Incorrect username or password. Try again.\n")

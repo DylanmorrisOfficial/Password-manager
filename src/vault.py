@@ -1,11 +1,19 @@
 import json
 from models import PasswordEntry
 from crypto_utils import encrypt, decrypt, get_key, save_key, load_key
+import os
+
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 
 class Vault:
-    def __init__(self):
+    def __init__(self, username):
+        os.makedirs(os.path.join(BASE_DIR, "vaults"), exist_ok=True)
+
+        self.username = username
         self.entries = []
+
+        self.file_name = os.path.join(BASE_DIR, "vaults", f"{username}.dat")
 
         key = load_key()
 
@@ -35,7 +43,7 @@ class Vault:
         # Returns a list of all entries in the vault
         return self.entries
 
-    def save_to_file(self, filename="vault.dat"):
+    def save_to_file(self):
         # Saves the vault entries to a file in encrypted format
         data = [entry.to_dict() for entry in self.entries]
 
@@ -43,13 +51,13 @@ class Vault:
 
         encrypted = encrypt(json_data, self.key)
 
-        with open(filename, "wb") as file:
+        with open(self.file_name, "wb") as file:
             file.write(encrypted)
 
-    def load_from_file(self, filename="vault.dat"):
+    def load_from_file(self):
         # Loads vault entries from a file, decrypting the data and populating entries
         try:
-            with open(filename, "rb") as file:
+            with open(self.file_name, "rb") as file:
                 encrypted_data = file.read()
 
             decrypted = decrypt(encrypted_data, self.key)

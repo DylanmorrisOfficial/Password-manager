@@ -131,6 +131,6 @@ def login():
 
     # Verifies the entered username and password, returns True if authentication is successful, otherwise returns False
     if verify_password(username, password):
-        return True
-    else:
-        return False
+        return username
+
+    return None
