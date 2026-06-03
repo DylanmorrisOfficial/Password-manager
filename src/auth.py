@@ -124,12 +124,8 @@ def validate_password(password, min_length=8):
     return errors
 
 
-def login():
-    # Prompts user for master password and verifies it against stored authentication data
-    username = input("\nEnter username: ")
-    password = getpass.getpass("Enter password: ")
-
-    # Verifies the entered username and password, returns True if authentication is successful, otherwise returns False
+def login(username, password):
+    # Verifies the entered username and password, if verification is successful, returns the username, otherwise returns None
     if verify_password(username, password):
         return username
 
