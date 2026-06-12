@@ -3,69 +3,133 @@ from tkinter import ttk
 import auth
 
 
-def login():
-    # Retrieves username and password from the entry fields and attempts to log in using the auth module, if login is successful, shows the vault screen, otherwise displays a login failed message
-    username = username_entry.get()
-    password = password_entry.get()
+class PasswordManagerGUI:
+    def __init__(self):
+        # Initializes the main application window, sets up the title, and initializes variables for the current user and vault, then shows the login screen
+        self.window = tk.Tk()
+        self.window.title("Password Manager")
+        self.window.geometry("600x400")
 
-    logged_in_user = auth.login(username, password)
+        self.current_user = None
+        self.current_vault = None
 
-    if logged_in_user:
-        # Displays login successful message, destroys login widgets, and shows the vault screen
-        message_label.config(text="Login successful")
-        destroy_login_widgets()
-        show_vault_screen(logged_in_user)
-    else:
-        # Displays login failed message
-        message_label.config(text="Login failed")
+        # Shows the login screen when the application starts
+        self.show_login_screen()
+
+    def clear_screen(self):
+        # Clears all widgets from the current screen to prepare for the next screen
+        for widget in self.window.winfo_children():
+            widget.destroy()
+
+    def show_login_screen(self):
+        # Clears the screen and sets up the login screen with entry fields for username and password, a message label for feedback, and buttons for login and account creation
+        self.clear_screen()
+
+        self.title = tk.Label(
+            self.window, text="Password Manager", font=("Arial", 24, "bold")
+        )
+        self.title.pack(pady=20)
+
+        tk.Label(self.window, text="Username").pack()
+        self.username_entry = tk.Entry(self.window)
+        self.username_entry.pack()
+
+        tk.Label(self.window, text="Password").pack()
+        self.password_entry = tk.Entry(self.window, show="*")
+        self.password_entry.pack()
+
+        self.message_label = tk.Label(self.window, text="")
+        self.message_label.pack()
+
+        self.login_button = ttk.Button(self.window, text="Login", command=self.login)
+        self.login_button.pack()
+
+        # Button to navigate to the account creation screen
+        self.create_account_button = ttk.Button(
+            self.window, text="Create Account", command=self.create_account
+        )
+        self.create_account_button.pack()
+
+    def login(self):
+        # Retrieves username and password from the entry fields and attempts to log in using the auth module, if login is successful, shows the vault screen, otherwise displays a login failed message
+        username = self.username_entry.get()
+        password = self.password_entry.get()
+
+        self.current_user = auth.login(username, password)
+
+        if self.current_user:
+            # Sets the current user, clears the screen, and shows the vault screen for the logged-in user
+            self.clear_screen()
+            self.show_vault_screen(self.current_user)
+        else:
+            # Displays login failed message
+            self.message_label.config(text="Login failed")
+
+    def show_vault_screen(self, username):
+        # Updates the title to welcome the logged-in user
+        self.clear_screen()
+
+        self.title = tk.Label(
+            self.window, text=f"Welcome {self.current_user}", font=("Arial", 24, "bold")
+        )
+        self.title.pack(pady=20)
+
+    def create_account(self):
+        # Clears the screen and sets up the account creation screen with entry fields for username, password, and password confirmation, a message label for feedback, and a button to save the new account
+        self.clear_screen()
+
+        self.title = tk.Label(
+            self.window, text="Create Account", font=("Arial", 24, "bold")
+        )
+        self.title.pack(pady=20)
+
+        tk.Label(self.window, text="Username").pack()
+        self.username_entry = tk.Entry(self.window)
+        self.username_entry.pack()
+
+        tk.Label(self.window, text="Password").pack()
+        self.password_entry = tk.Entry(self.window, show="*")
+        self.password_entry.pack()
+
+        tk.Label(self.window, text="Confirm Password").pack()
+        self.confirm_password_entry = tk.Entry(self.window, show="*")
+        self.confirm_password_entry.pack()
+
+        self.create_message_label = tk.Label(self.window, text="")
+        self.create_message_label.pack()
+
+        # Button to save the new account and navigate back to the login screen if account creation is successful
+        self.create_account_button = ttk.Button(
+            self.window,
+            text="Create Account",
+            command=lambda: self.save_account(),
+        )
+
+        self.create_account_button.pack(pady=10)
+
+    def save_account(
+        self,
+    ):
+        # Retrieves username, password, and password confirmation from the entry fields, checks if the passwords match, if they do, attempts to register the new account using the auth module, if registration is successful, shows the login screen, otherwise displays error messages
+        username = self.username_entry.get()
+        password = self.password_entry.get()
+        confirm = self.confirm_password_entry.get()
+
+        if password != confirm:
+            # Displays message if passwords do not match and prompts user to try again
+            self.create_message_label.config(text="Passwords do not match")
+            return
+
+        success, message = auth.register(username, password)
+
+        if success:
+            # Clears the screen and shows the login screen after successful account creation
+            self.show_login_screen()
+        else:
+            # Displays error messages if account creation failed and prompts user to try again
+            self.create_message_label.config(text=message)
 
 
-def destroy_login_widgets():
-    # Destroys all login-related widgets to clear the screen for the vault interface
-    username_label.destroy()
-    username_entry.destroy()
-    password_label.destroy()
-    password_entry.destroy()
-    login_button.destroy()
-    message_label.destroy()
-
-
-def show_vault_screen(username):
-    # Updates the title to welcome the logged-in user
-    title.config(text=f"Welcome {username}")
-
-
-# Main application window setup
-window = tk.Tk()
-
-window.title("Password Manager")
-window.geometry("600x400")
-
-title = tk.Label(window, text="Password Manager", font=("Arial", 24, "bold"))
-
-title.pack(pady=20)
-
-username_label = tk.Label(window, text="Username")
-
-username_label.pack()
-
-username_entry = tk.Entry(window)
-
-username_entry.pack()
-
-password_label = tk.Label(window, text="Password")
-
-password_label.pack()
-
-password_entry = tk.Entry(window, show="*")
-
-password_entry.pack()
-
-login_button = ttk.Button(window, text="Login", command=login)
-
-login_button.pack(pady=10)
-
-message_label = tk.Label(window, text="")
-message_label.pack(pady=5)
-
-window.mainloop()
+# Main entry point to start the application
+app = PasswordManagerGUI()
+app.window.mainloop()

@@ -124,6 +124,29 @@ def validate_password(password, min_length=8):
     return errors
 
 
+def register(username, password):
+    # Registers a new user by checking if the username already exists, validating the password, and saving the authentication data if registration is successful, otherwise returns an error message
+    auth_data = load_auth_data()
+
+    # Checks if the entered username already exists in the authentication data, if it does, returns an error message
+    if username in auth_data:
+        return False, "Username already exists"
+
+    errors = validate_password(password)
+
+    # Validates the entered password against the defined requirements, if there are errors, returns a message containing the errors
+    if errors:
+        return False, "\n".join(errors)
+
+    # Generates a salt, hashes the password, saves the authentication data, and returns a success message
+    salt = generate_salt()
+    hashed_password = hash_password(password, salt)
+
+    save_auth_data(username, salt, hashed_password)
+
+    return True, ""
+
+
 def login(username, password):
     # Verifies the entered username and password, if verification is successful, returns the username, otherwise returns None
     if verify_password(username, password):
