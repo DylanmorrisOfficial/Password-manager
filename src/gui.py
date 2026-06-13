@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 import auth
+import vault
 
 
 class PasswordManagerGUI:
@@ -15,6 +16,8 @@ class PasswordManagerGUI:
 
         # Shows the login screen when the application starts
         self.show_login_screen()
+
+        self.vault = None
 
     def clear_screen(self):
         # Clears all widgets from the current screen to prepare for the next screen
@@ -58,14 +61,16 @@ class PasswordManagerGUI:
         self.current_user = auth.login(username, password)
 
         if self.current_user:
-            # Sets the current user, clears the screen, and shows the vault screen for the logged-in user
+            # Clears the screen, initializes the vault for the logged-in user, loads the vault from file, and shows the vault screen
             self.clear_screen()
-            self.show_vault_screen(self.current_user)
+            self.vault = vault.Vault(self.current_user)
+            self.vault.load_from_file()
+            self.show_vault_screen()
         else:
             # Displays login failed message
             self.message_label.config(text="Login failed")
 
-    def show_vault_screen(self, username):
+    def show_vault_screen(self):
         # Updates the title to welcome the logged-in user
         self.clear_screen()
 
@@ -73,6 +78,52 @@ class PasswordManagerGUI:
             self.window, text=f"Welcome {self.current_user}", font=("Arial", 24, "bold")
         )
         self.title.pack(pady=20)
+
+        self.add_entry_button = ttk.Button(
+            self.window, text="Add Entry", command=self.add_entry
+        )
+        self.add_entry_button.pack()
+
+        self.delete_entry_button = ttk.Button(
+            self.window, text="Delete Entry", command=self.delete_entry
+        )
+        self.delete_entry_button.pack()
+
+        self.get_entry_button = ttk.Button(
+            self.window, text="Get Entry", command=self.get_entry
+        )
+        self.get_entry_button.pack()
+
+        self.list_entries_button = ttk.Button(
+            self.window, text="List Entries", command=self.list_entries
+        )
+        self.list_entries_button.pack()
+
+        self.logout_button = ttk.Button(self.window, text="Logout", command=self.logout)
+        self.logout_button.pack()
+
+    def add_entry(self):
+        # Placeholder method for adding a new entry to the vault, currently just prints a message
+        print("Add entry functionality not implemented yet.")
+
+    def delete_entry(self):
+        # Placeholder method for deleting an entry from the vault, currently just prints a message
+        print("Delete entry functionality not implemented yet.")
+
+    def get_entry(self):
+        # Placeholder method for retrieving an entry from the vault, currently just prints a message
+        print("Get entry functionality not implemented yet.")
+
+    def list_entries(self):
+        # Placeholder method for listing all entries in the vault, currently just prints a message
+        print("List entries functionality not implemented yet.")
+
+    def logout(self):
+        # Logs out the current user, clears the screen, and shows the login screen
+        self.current_user = None
+        self.vault.save_to_file()
+        self.clear_screen()
+        self.show_login_screen()
 
     def create_account(self):
         # Clears the screen and sets up the account creation screen with entry fields for username, password, and password confirmation, a message label for feedback, and a button to save the new account
