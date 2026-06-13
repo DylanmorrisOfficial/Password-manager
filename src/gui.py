@@ -177,8 +177,34 @@ class PasswordManagerGUI:
         return generate_password()
 
     def delete_entry(self):
-        # Placeholder method for deleting an entry from the vault, currently just prints a message
-        print("Delete entry functionality not implemented yet.")
+        self.clear_screen()
+
+        tk.Label(self.window, text="Service Name").pack()
+
+        self.service_entry = tk.Entry(self.window)
+        self.service_entry.pack()
+
+        tk.Button(self.window, text="Delete Entry", command=self.confirm_delete).pack()
+
+        tk.Button(
+            self.window, text="Return to Vault", command=self.show_vault_screen
+        ).pack()
+
+    def confirm_delete(self):
+        # Retrieves the service name from the entry field, checks if it is provided, removes the entry from the vault, displays a success message, and returns to the vault screen
+        service = self.service_entry.get().strip()
+
+        if not service:
+            # Displays an error message if the service name is not provided and prompts user to try again
+            messagebox.showerror("Error", "Please enter a service name")
+            return
+
+        # Removes the entry for the specified service from the vault and displays a success message
+        self.vault.remove_entry(service)
+
+        messagebox.showinfo("Success", f"Entry for {service} removed")
+
+        self.show_vault_screen()
 
     def get_entry(self):
         # Placeholder method for retrieving an entry from the vault, currently just prints a message
