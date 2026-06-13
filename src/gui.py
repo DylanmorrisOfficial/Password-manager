@@ -1,6 +1,8 @@
 import tkinter as tk
 from tkinter import ttk
+from tkinter import messagebox
 import auth
+import models
 import vault
 
 
@@ -103,8 +105,76 @@ class PasswordManagerGUI:
         self.logout_button.pack()
 
     def add_entry(self):
-        # Placeholder method for adding a new entry to the vault, currently just prints a message
-        print("Add entry functionality not implemented yet.")
+        # Clears the screen and sets up the add entry screen with entry fields for service name, username, password, and notes, a checkbox to generate a random password, and a button to save the new entry
+        self.clear_screen()
+
+        tk.Label(self.window, text="Service Name").pack()
+        self.service_entry = tk.Entry(self.window)
+        self.service_entry.pack()
+
+        tk.Label(self.window, text="Username").pack()
+        self.username_entry = tk.Entry(self.window)
+        self.username_entry.pack()
+
+        self.generate_var = tk.BooleanVar()
+
+        tk.Checkbutton(
+            self.window, text="Generate Random Password", variable=self.generate_var
+        ).pack()
+
+        tk.Label(self.window, text="Password").pack()
+        self.password_entry = tk.Entry(self.window, show="*")
+        self.password_entry.pack()
+
+        tk.Label(self.window, text="Notes").pack()
+        self.notes_text = tk.Text(self.window, height=4, width=30)
+        self.notes_text.pack()
+
+        tk.Button(self.window, text="Save Entry", command=self.save_entry).pack()
+        tk.Button(
+            self.window, text="Return to Vault", command=self.show_vault_screen
+        ).pack()
+
+    def save_entry(self):
+        # Retrieves service name, username, password, and notes from the entry fields, checks if service and username are provided, generates a random password if the checkbox is selected, creates a new PasswordEntry object, adds it to the vault, and displays a success message
+        service = self.service_entry.get().strip()
+        username = self.username_entry.get().strip()
+
+        if not service:
+            # Displays an error message if the service name is not provided and prompts user to try again
+            messagebox.showerror("Error", "Service required")
+            return
+
+        if not username:
+            # Displays an error message if the username is not provided and prompts user to try again
+            messagebox.showerror("Error", "Username required")
+            return
+
+        if self.generate_var.get():
+            # Generates a random password if the checkbox is selected
+            password = self.generate_random_password()
+        else:
+            # Retrieves the password from the entry field and strips any leading/trailing whitespace
+            password = self.password_entry.get().strip()
+
+        # Retrieves notes from the text field and strips any leading/trailing whitespace
+        notes = self.notes_text.get("1.0", tk.END).strip()
+
+        # Creates a new PasswordEntry object with the provided service, username, password, and notes, adds it to the vault, and displays a success message
+        entry = models.PasswordEntry(service, username, password, notes)
+
+        # Adds the new entry to the vault and displays a success message
+        self.vault.add_entry(entry)
+
+        messagebox.showinfo("Success", f"Entry for {service} added")
+
+        self.show_vault_screen()
+
+    def generate_random_password(self):
+        # Generates a random password using the password generator
+        from password_generator import generate_password
+
+        return generate_password()
 
     def delete_entry(self):
         # Placeholder method for deleting an entry from the vault, currently just prints a message
