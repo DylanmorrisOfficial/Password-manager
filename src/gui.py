@@ -284,8 +284,26 @@ class PasswordManagerGUI:
             self.password_visible = True
 
     def list_entries(self):
-        # Placeholder method for listing all entries in the vault, currently just prints a message
-        print("List entries functionality not implemented yet.")
+        # Clears the screen and displays a list of all entries in the vault, showing service names and usernames, with a button to return to the vault screen
+        self.clear_screen()
+
+        entries = self.vault.list_entries()
+
+        if entries:
+            # Displays each entry's service name and username in the list
+            for entry in entries:
+                tk.Label(self.window, text=f"Service: {entry.service}").pack()
+
+                tk.Label(self.window, text=f"Username: {entry.username}").pack()
+
+                tk.Label(self.window, text="────────────────────").pack(pady=5)
+        else:
+            # Displays a message if no entries are found in the vault
+            tk.Label(self.window, text="No entries found").pack()
+
+        tk.Button(
+            self.window, text="Return to Vault", command=self.show_vault_screen
+        ).pack()
 
     def logout(self):
         # Logs out the current user, clears the screen, and shows the login screen
