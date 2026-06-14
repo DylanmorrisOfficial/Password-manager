@@ -168,8 +168,6 @@ class PasswordManagerGUI:
 
         messagebox.showinfo("Success", f"Entry for {service} added")
 
-        self.show_vault_screen()
-
     def generate_random_password(self):
         # Generates a random password using the password generator
         from password_generator import generate_password
@@ -177,6 +175,7 @@ class PasswordManagerGUI:
         return generate_password()
 
     def delete_entry(self):
+        # Clears the screen and sets up the delete entry screen with an entry field for service name, a button to confirm deletion, and a button to return to the vault screen
         self.clear_screen()
 
         tk.Label(self.window, text="Service Name").pack()
@@ -204,11 +203,85 @@ class PasswordManagerGUI:
 
         messagebox.showinfo("Success", f"Entry for {service} removed")
 
-        self.show_vault_screen()
-
     def get_entry(self):
-        # Placeholder method for retrieving an entry from the vault, currently just prints a message
-        print("Get entry functionality not implemented yet.")
+        # Clears the screen and sets up the get entry screen with an entry field for service name, a button to retrieve the entry, and a button to return to the vault screen
+        self.clear_screen()
+
+        tk.Label(self.window, text="Service Name").pack()
+        self.service_entry = tk.Entry(self.window)
+        self.service_entry.pack()
+
+        tk.Button(self.window, text="Get Entry", command=self.show_entry).pack()
+
+        tk.Button(
+            self.window, text="Return to Vault", command=self.show_vault_screen
+        ).pack()
+
+    def show_entry(self):
+        # Retrieves the service name from the entry field, checks if it is provided, retrieves the entry from the vault, and displays the entry details or an error message if the entry is not found
+        service = self.service_entry.get().strip()
+
+        if not service:
+            # Displays an error message if the service name is not provided and prompts user to try again
+            messagebox.showerror("Error", "Please enter a service name")
+            return
+
+        # Retrieves the entry for the specified service from the vault
+        entry = self.vault.get_entry(service)
+
+        if not entry:
+            # Displays an error message if the entry is not found and prompts user to try again
+            messagebox.showerror("Error", "Entry not found")
+            return
+
+        # Displays the entry details using the print_entry method
+        self.print_entry(entry)
+
+    def print_entry(self, entry):
+        # Clears the screen and displays the entry details, including service name, username, password (hidden by default), and notes, with a button to toggle password visibility and a button to return to the vault screen
+        self.clear_screen()
+
+        tk.Label(
+            self.window, text=entry.service.upper(), font=("Arial", 14, "bold")
+        ).pack(pady=5)
+
+        tk.Label(self.window, text=f"Username: {entry.username}").pack()
+
+        self.password_visible = False
+        self.entry = entry
+
+        self.password_label = tk.Label(
+            self.window, text=f"Password: {'*' * len(entry.password)}"
+        )
+        self.password_label.pack()
+
+        tk.Label(self.window, text=f"Notes: {entry.notes}").pack()
+
+        self.password_button = tk.Button(
+            self.window, text="Show Password", command=self.toggle_password
+        )
+
+        self.password_button.pack(pady=5)
+
+        tk.Button(
+            self.window, text="Return to Vault", command=self.show_vault_screen
+        ).pack()
+
+    def toggle_password(self):
+        # Toggles the visibility of the password in the entry details, updating the password label and button text accordingly
+        if self.password_visible:
+            # Hides the password
+            self.password_label.config(
+                text=f"Password: {'*' * len(self.entry.password)}"
+            )
+            self.password_button.config(text="Show Password")
+            self.password_visible = False
+
+        else:
+            # Shows the password
+            self.password_label.config(text=f"Password: {self.entry.password}")
+            self.password_button.config(text="Hide Password")
+            self.password_visible = True
 
     def list_entries(self):
         # Placeholder method for listing all entries in the vault, currently just prints a message
