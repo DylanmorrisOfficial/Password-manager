@@ -1,20 +1,25 @@
 import tkinter as tk
-from tkinter import ttk
 from tkinter import messagebox
 import auth
 import models
 import vault
+import ttkbootstrap as ttk
 
 
 class PasswordManagerGUI:
     def __init__(self):
-        # Initializes the main application window, sets up the title, and initializes variables for the current user and vault, then shows the login screen
-        self.window = tk.Tk()
+        # Initializes the main window of the application with a dark theme, sets the title and size, and initializes variables for the current user and vault. It also defines font styles for the title, headings, and text in the application.
+        self.window = ttk.Window(themename="darkly")
         self.window.title("Password Manager")
         self.window.geometry("600x400")
 
         self.current_user = None
         self.current_vault = None
+
+        # Defines font styles for the title, headings, and text in the application
+        self.TITLE_FONT = ("Segoe UI", 24, "bold")
+        self.HEADING_FONT = ("Segoe UI", 14)
+        self.TEXT_FONT = ("Segoe UI", 11)
 
         # Shows the login screen when the application starts
         self.show_login_screen()
@@ -30,30 +35,30 @@ class PasswordManagerGUI:
         # Clears the screen and sets up the login screen with entry fields for username and password, a message label for feedback, and buttons for login and account creation
         self.clear_screen()
 
-        self.title = tk.Label(
-            self.window, text="Password Manager", font=("Arial", 24, "bold")
+        self.title = ttk.Label(
+            self.window, text="Password Manager", font=self.TITLE_FONT
         )
         self.title.pack(pady=20)
 
-        tk.Label(self.window, text="Username").pack()
-        self.username_entry = tk.Entry(self.window)
-        self.username_entry.pack()
+        ttk.Label(self.window, text="Username", font=self.HEADING_FONT).pack()
+        self.username_entry = ttk.Entry(self.window, font=self.TEXT_FONT)
+        self.username_entry.pack(pady=5)
 
-        tk.Label(self.window, text="Password").pack()
-        self.password_entry = tk.Entry(self.window, show="*")
-        self.password_entry.pack()
+        ttk.Label(self.window, text="Password", font=self.HEADING_FONT).pack()
+        self.password_entry = ttk.Entry(self.window, show="*", font=self.TEXT_FONT)
+        self.password_entry.pack(pady=5)
 
-        self.message_label = tk.Label(self.window, text="")
-        self.message_label.pack()
+        self.message_label = ttk.Label(self.window, text="", font=self.TEXT_FONT)
+        self.message_label.pack(pady=5)
 
         self.login_button = ttk.Button(self.window, text="Login", command=self.login)
-        self.login_button.pack()
+        self.login_button.pack(pady=10)
 
         # Button to navigate to the account creation screen
         self.create_account_button = ttk.Button(
             self.window, text="Create Account", command=self.create_account
         )
-        self.create_account_button.pack()
+        self.create_account_button.pack(pady=10)
 
     def login(self):
         # Retrieves username and password from the entry fields and attempts to log in using the auth module, if login is successful, shows the vault screen, otherwise displays a login failed message
@@ -76,64 +81,67 @@ class PasswordManagerGUI:
         # Updates the title to welcome the logged-in user
         self.clear_screen()
 
-        self.title = tk.Label(
-            self.window, text=f"Welcome {self.current_user}", font=("Arial", 24, "bold")
+        self.title = ttk.Label(
+            self.window, text=f"Welcome {self.current_user}", font=self.TITLE_FONT
         )
         self.title.pack(pady=20)
 
         self.add_entry_button = ttk.Button(
             self.window, text="Add Entry", command=self.add_entry
         )
-        self.add_entry_button.pack()
+        self.add_entry_button.pack(pady=10)
 
         self.delete_entry_button = ttk.Button(
             self.window, text="Delete Entry", command=self.delete_entry
         )
-        self.delete_entry_button.pack()
+        self.delete_entry_button.pack(pady=10)
 
         self.get_entry_button = ttk.Button(
             self.window, text="Get Entry", command=self.get_entry
         )
-        self.get_entry_button.pack()
+        self.get_entry_button.pack(pady=10)
 
         self.list_entries_button = ttk.Button(
             self.window, text="List Entries", command=self.list_entries
         )
-        self.list_entries_button.pack()
+        self.list_entries_button.pack(pady=10)
 
         self.logout_button = ttk.Button(self.window, text="Logout", command=self.logout)
-        self.logout_button.pack()
+        self.logout_button.pack(pady=10)
 
     def add_entry(self):
         # Clears the screen and sets up the add entry screen with entry fields for service name, username, password, and notes, a checkbox to generate a random password, and a button to save the new entry
         self.clear_screen()
 
-        tk.Label(self.window, text="Service Name").pack()
-        self.service_entry = tk.Entry(self.window)
-        self.service_entry.pack()
+        ttk.Label(self.window, text="Service Name", font=self.HEADING_FONT).pack()
+        self.service_entry = ttk.Entry(self.window, font=self.TEXT_FONT)
+        self.service_entry.pack(pady=5)
 
-        tk.Label(self.window, text="Username").pack()
-        self.username_entry = tk.Entry(self.window)
-        self.username_entry.pack()
+        ttk.Label(self.window, text="Username", font=self.HEADING_FONT).pack()
+        self.username_entry = ttk.Entry(self.window, font=self.TEXT_FONT)
+        self.username_entry.pack(pady=5)
 
         self.generate_var = tk.BooleanVar()
 
-        tk.Checkbutton(
+        ttk.Label(self.window, text="Password", font=self.HEADING_FONT).pack()
+        self.password_entry = ttk.Entry(self.window, show="*", font=self.TEXT_FONT)
+        self.password_entry.pack(pady=5)
+
+        ttk.Checkbutton(
             self.window, text="Generate Random Password", variable=self.generate_var
-        ).pack()
+        ).pack(pady=5)
 
-        tk.Label(self.window, text="Password").pack()
-        self.password_entry = tk.Entry(self.window, show="*")
-        self.password_entry.pack()
+        ttk.Label(self.window, text="Notes", font=self.HEADING_FONT).pack()
+        self.notes_text = tk.Text(self.window, height=4, width=30, font=self.TEXT_FONT)
+        self.notes_text.pack(pady=5)
 
-        tk.Label(self.window, text="Notes").pack()
-        self.notes_text = tk.Text(self.window, height=4, width=30)
-        self.notes_text.pack()
+        ttk.Button(self.window, text="Save Entry", command=self.save_entry).pack(
+            pady=10
+        )
 
-        tk.Button(self.window, text="Save Entry", command=self.save_entry).pack()
-        tk.Button(
+        ttk.Button(
             self.window, text="Return to Vault", command=self.show_vault_screen
-        ).pack()
+        ).pack(pady=10)
 
     def save_entry(self):
         # Retrieves service name, username, password, and notes from the entry fields, checks if service and username are provided, generates a random password if the checkbox is selected, creates a new PasswordEntry object, adds it to the vault, and displays a success message
@@ -178,16 +186,18 @@ class PasswordManagerGUI:
         # Clears the screen and sets up the delete entry screen with an entry field for service name, a button to confirm deletion, and a button to return to the vault screen
         self.clear_screen()
 
-        tk.Label(self.window, text="Service Name").pack()
+        ttk.Label(self.window, text="Service Name", font=self.HEADING_FONT).pack(pady=5)
 
-        self.service_entry = tk.Entry(self.window)
-        self.service_entry.pack()
+        self.service_entry = ttk.Entry(self.window, font=self.TEXT_FONT)
+        self.service_entry.pack(pady=5)
 
-        tk.Button(self.window, text="Delete Entry", command=self.confirm_delete).pack()
+        ttk.Button(self.window, text="Delete Entry", command=self.confirm_delete).pack(
+            pady=10
+        )
 
-        tk.Button(
+        ttk.Button(
             self.window, text="Return to Vault", command=self.show_vault_screen
-        ).pack()
+        ).pack(pady=10)
 
     def confirm_delete(self):
         # Retrieves the service name from the entry field, checks if it is provided, removes the entry from the vault, displays a success message, and returns to the vault screen
@@ -207,15 +217,15 @@ class PasswordManagerGUI:
         # Clears the screen and sets up the get entry screen with an entry field for service name, a button to retrieve the entry, and a button to return to the vault screen
         self.clear_screen()
 
-        tk.Label(self.window, text="Service Name").pack()
-        self.service_entry = tk.Entry(self.window)
-        self.service_entry.pack()
+        ttk.Label(self.window, text="Service Name", font=self.HEADING_FONT).pack(pady=5)
+        self.service_entry = ttk.Entry(self.window, font=self.TEXT_FONT)
+        self.service_entry.pack(pady=5)
 
-        tk.Button(self.window, text="Get Entry", command=self.show_entry).pack()
+        ttk.Button(self.window, text="Get Entry", command=self.show_entry).pack(pady=10)
 
-        tk.Button(
+        ttk.Button(
             self.window, text="Return to Vault", command=self.show_vault_screen
-        ).pack()
+        ).pack(pady=10)
 
     def show_entry(self):
         # Retrieves the service name from the entry field, checks if it is provided, retrieves the entry from the vault, and displays the entry details or an error message if the entry is not found
@@ -241,31 +251,36 @@ class PasswordManagerGUI:
         # Clears the screen and displays the entry details, including service name, username, password (hidden by default), and notes, with a button to toggle password visibility and a button to return to the vault screen
         self.clear_screen()
 
-        tk.Label(
-            self.window, text=entry.service.upper(), font=("Arial", 14, "bold")
-        ).pack(pady=5)
+        ttk.Label(self.window, text=entry.service.upper(), font=self.HEADING_FONT).pack(
+            pady=5
+        )
 
-        tk.Label(self.window, text=f"Username: {entry.username}").pack()
+        ttk.Label(
+            self.window, text=f"Username: {entry.username}", font=self.TEXT_FONT
+        ).pack(pady=5)
 
         self.password_visible = False
         self.entry = entry
 
-        self.password_label = tk.Label(
-            self.window, text=f"Password: {'*' * len(entry.password)}"
+        self.password_label = ttk.Label(
+            self.window,
+            text=f"Password: {'*' * len(entry.password)}",
+            font=self.TEXT_FONT,
         )
-        self.password_label.pack()
+        self.password_label.pack(pady=5)
 
-        tk.Label(self.window, text=f"Notes: {entry.notes}").pack()
+        ttk.Label(self.window, text=f"Notes: {entry.notes}", font=self.TEXT_FONT).pack(
+            pady=5
+        )
 
-        self.password_button = tk.Button(
+        self.password_button = ttk.Button(
             self.window, text="Show Password", command=self.toggle_password
         )
+        self.password_button.pack(pady=10)
 
-        self.password_button.pack(pady=5)
-
-        tk.Button(
+        ttk.Button(
             self.window, text="Return to Vault", command=self.show_vault_screen
-        ).pack()
+        ).pack(pady=10)
 
     def toggle_password(self):
         # Toggles the visibility of the password in the entry details, updating the password label and button text accordingly
@@ -292,18 +307,18 @@ class PasswordManagerGUI:
         if entries:
             # Displays each entry's service name and username in the list
             for entry in entries:
-                tk.Label(self.window, text=f"Service: {entry.service}").pack()
+                ttk.Label(self.window, text=f"Service: {entry.service}").pack(pady=5)
 
-                tk.Label(self.window, text=f"Username: {entry.username}").pack()
+                ttk.Label(self.window, text=f"Username: {entry.username}").pack(pady=5)
 
-                tk.Label(self.window, text="────────────────────").pack(pady=5)
+                ttk.Label(self.window, text="────────────────────").pack(pady=5)
         else:
             # Displays a message if no entries are found in the vault
-            tk.Label(self.window, text="No entries found").pack()
+            ttk.Label(self.window, text="No entries found").pack(pady=5)
 
-        tk.Button(
+        ttk.Button(
             self.window, text="Return to Vault", command=self.show_vault_screen
-        ).pack()
+        ).pack(pady=10)
 
     def logout(self):
         # Logs out the current user, clears the screen, and shows the login screen
@@ -316,25 +331,29 @@ class PasswordManagerGUI:
         # Clears the screen and sets up the account creation screen with entry fields for username, password, and password confirmation, a message label for feedback, and a button to save the new account
         self.clear_screen()
 
-        self.title = tk.Label(
-            self.window, text="Create Account", font=("Arial", 24, "bold")
+        self.title = ttk.Label(
+            self.window, text="Create Account", font=self.HEADING_FONT
         )
         self.title.pack(pady=20)
 
-        tk.Label(self.window, text="Username").pack()
-        self.username_entry = tk.Entry(self.window)
-        self.username_entry.pack()
+        ttk.Label(self.window, text="Username", font=self.HEADING_FONT).pack(pady=5)
+        self.username_entry = ttk.Entry(self.window, font=self.TEXT_FONT)
+        self.username_entry.pack(pady=5)
 
-        tk.Label(self.window, text="Password").pack()
-        self.password_entry = tk.Entry(self.window, show="*")
-        self.password_entry.pack()
+        ttk.Label(self.window, text="Password", font=self.HEADING_FONT).pack(pady=5)
+        self.password_entry = ttk.Entry(self.window, show="*", font=self.TEXT_FONT)
+        self.password_entry.pack(pady=5)
 
-        tk.Label(self.window, text="Confirm Password").pack()
-        self.confirm_password_entry = tk.Entry(self.window, show="*")
-        self.confirm_password_entry.pack()
+        ttk.Label(self.window, text="Confirm Password", font=self.HEADING_FONT).pack(
+            pady=5
+        )
+        self.confirm_password_entry = ttk.Entry(
+            self.window, show="*", font=self.TEXT_FONT
+        )
+        self.confirm_password_entry.pack(pady=5)
 
-        self.create_message_label = tk.Label(self.window, text="")
-        self.create_message_label.pack()
+        self.create_message_label = ttk.Label(self.window, text="", font=self.TEXT_FONT)
+        self.create_message_label.pack(pady=5)
 
         # Button to save the new account and navigate back to the login screen if account creation is successful
         self.create_account_button = ttk.Button(
@@ -342,8 +361,11 @@ class PasswordManagerGUI:
             text="Create Account",
             command=lambda: self.save_account(),
         )
-
         self.create_account_button.pack(pady=10)
+
+        ttk.Button(
+            self.window, text="Return to Login", command=self.show_login_screen
+        ).pack(pady=10)
 
     def save_account(
         self,
