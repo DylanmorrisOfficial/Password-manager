@@ -5,6 +5,13 @@ import os
 import getpass
 import string
 
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+DATA_DIR = os.path.join(BASE_DIR, "data")
+
+os.makedirs(DATA_DIR, exist_ok=True)
+
+AUTH_FILE = os.path.join(DATA_DIR, "auth_data.json")
+
 
 def generate_salt():
     # Generates a random salt using the secrets module
@@ -26,7 +33,7 @@ def save_auth_data(username, salt, hashed_password):
 
     auth_data[username] = {"salt": salt, "hashed_password": hashed_password}
 
-    with open("auth_data.json", "w") as file:
+    with open(AUTH_FILE, "w") as file:
         json.dump(auth_data, file)
 
 
@@ -50,15 +57,15 @@ def create_master_password():
 
 def auth_exists():
     # Checks if the authentication data file exists
-    return os.path.exists("auth_data.json")
+    return os.path.exists(AUTH_FILE)
 
 
 def load_auth_data():
     # Loads the authentication data from the JSON file, returns an empty dictionary if file not found
-    if not os.path.exists("auth_data.json"):
+    if not os.path.exists(AUTH_FILE):
         return {}
 
-    with open("auth_data.json", "r") as file:
+    with open(AUTH_FILE, "r") as file:
         return json.load(file)
 
 

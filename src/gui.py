@@ -331,9 +331,7 @@ class PasswordManagerGUI:
         # Clears the screen and sets up the account creation screen with entry fields for username, password, and password confirmation, a message label for feedback, and a button to save the new account
         self.clear_screen()
 
-        self.title = ttk.Label(
-            self.window, text="Create Account", font=self.HEADING_FONT
-        )
+        self.title = ttk.Label(self.window, text="Create Account", font=self.TITLE_FONT)
         self.title.pack(pady=20)
 
         ttk.Label(self.window, text="Username", font=self.HEADING_FONT).pack(pady=5)

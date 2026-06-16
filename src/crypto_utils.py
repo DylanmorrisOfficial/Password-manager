@@ -1,6 +1,12 @@
+import os
 from cryptography.fernet import Fernet
 
-KEY_FILE = "key.key"
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+DATA_DIR = os.path.join(BASE_DIR, "data")
+
+os.makedirs(DATA_DIR, exist_ok=True)
+
+KEY_FILE = os.path.join(DATA_DIR, "key.key")
 
 
 def generate_key():
