@@ -1,4 +1,6 @@
 import os
+import hashlib
+import base64
 from cryptography.fernet import Fernet
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -9,35 +11,19 @@ os.makedirs(DATA_DIR, exist_ok=True)
 KEY_FILE = os.path.join(DATA_DIR, "key.key")
 
 
-def generate_key():
-    return Fernet.generate_key()
+def derive_key(password: str, salt: str):
+    # Creates a hashed key using the master password and salt
+    key = hashlib.pbkdf2_hmac("sha256", password.encode(), salt.encode(), 100000)
+    return base64.urlsafe_b64encode(key)
 
 
-def save_key(key: bytes):
-    with open(KEY_FILE, "wb") as f:
-        f.write(key)
+def encrypt(data: bytes, password: str, salt: str):
+    # Encrypts the data with the derived key
+    key = derive_key(password, salt)
+    return Fernet(key).encrypt(data)
 
 
-def load_key():
-    with open(KEY_FILE, "rb") as f:
-        return f.read()
-
-
-def get_key():
-    # Tries to load existing key file or generates a new key if file not found
-    try:
-        return load_key()
-    except FileNotFoundError:
-        key = generate_key()
-        save_key(key)
-        return key
-
-
-def encrypt(data: bytes, key: bytes) -> bytes:
-    f = Fernet(key)
-    return f.encrypt(data)
-
-
-def decrypt(data: bytes, key: bytes) -> bytes:
-    f = Fernet(key)
-    return f.decrypt(data)
+def decrypt(data: bytes, password: str, salt: str):
+    # Decrytps the data with the derived key
+    key = derive_key(password, salt)
+    return Fernet(key).decrypt(data)

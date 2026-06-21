@@ -70,7 +70,7 @@ class PasswordManagerGUI:
         if self.current_user:
             # Clears the screen, initializes the vault for the logged-in user, loads the vault from file, and shows the vault screen
             self.clear_screen()
-            self.vault = vault.Vault(self.current_user)
+            self.vault = vault.Vault(self.current_user, password)
             self.vault.load_from_file()
             self.show_vault_screen()
         else:

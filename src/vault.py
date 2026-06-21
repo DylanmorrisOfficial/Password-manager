@@ -1,28 +1,27 @@
 import json
 from models import PasswordEntry
-from crypto_utils import encrypt, decrypt, get_key, save_key, load_key
+from crypto_utils import encrypt, decrypt, derive_key
 import os
+from auth import load_auth_data
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 
 class Vault:
-    def __init__(self, username):
+    def __init__(self, username, password):
         os.makedirs(os.path.join(BASE_DIR, "vaults"), exist_ok=True)
 
         self.username = username
+        self.password = password
         self.entries = []
 
         self.file_name = os.path.join(BASE_DIR, "vaults", f"{username}.dat")
 
-        key = load_key()
+        # Loads the users authentication data and gets the salt
+        auth_data = load_auth_data()
+        self.salt = auth_data[username]["salt"]
 
-        if not key:
-            # Generates a new key and save it if no key is found
-            key = get_key()
-            save_key(key)
-
-        self.key = key
+        self.key = derive_key(password, self.salt)
 
     def add_entry(self, entry):
         # Adds a new entry to entries
@@ -49,7 +48,7 @@ class Vault:
 
         json_data = json.dumps(data).encode()
 
-        encrypted = encrypt(json_data, self.key)
+        encrypted = encrypt(json_data, self.password, self.salt)
 
         with open(self.file_name, "wb") as file:
             file.write(encrypted)
@@ -60,7 +59,7 @@ class Vault:
             with open(self.file_name, "rb") as file:
                 encrypted_data = file.read()
 
-            decrypted = decrypt(encrypted_data, self.key)
+            decrypted = decrypt(encrypted_data, self.password, self.salt)
 
             json_data = decrypted.decode()
 
