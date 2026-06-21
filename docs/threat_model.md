@@ -32,9 +32,9 @@ Used to authenticate users.
 
 Usernames, passwords, and notes stored within vault entries.
 
-### Encryption Keys
+### Derived Encryption Keys
 
-Keys used to encrypt and decrypt vault data.
+Encryption keys derived from the user's master password and used to encrypt and decrypt vault data.
 
 ### Vault Files
 
@@ -88,7 +88,9 @@ An attacker copies encrypted vault files from disk.
 
 #### Mitigation
 
-* Vault files are encrypted using Fernet encryption.
+* Vault files are encrypted using Fernet authenticated encryption.
+* Encryption keys are derived from the user's master password using PBKDF2-HMAC-SHA256.
+* Encryption keys are not stored on disk.
 * Vault contents are not stored in plaintext.
 
 ---
@@ -149,18 +151,16 @@ An attacker modifies encrypted vault files.
 
 ## Known Limitations
 
-### Separate Encryption Key Storage
-
-The current implementation stores the vault encryption key separately from the user's master password.
+### Offline Password Guessing Risk
 
 If an attacker obtains:
 
 * The encrypted vault file
-* The encryption key file
+* Authentication data containing salts and password hashes
 
-they may be able to decrypt vault contents without knowing the master password.
+they may attempt offline password guessing attacks against weak master passwords.
 
-Future versions should derive encryption keys directly from the user's master password.
+Security therefore depends heavily on the strength of the user's master password and the computational cost of PBKDF2.
 
 ### Trusted Environment Assumption
 
@@ -188,7 +188,10 @@ This threat model assumes:
 
 ## Future Improvements
 
-* Derive vault encryption keys from master passwords.
+* Increase PBKDF2 iteration count or migrate to Argon2id.
+* Implement automatic vault backups.
+* Add password expiration and reuse detection.
+* Support multi-factor authentication.
 
 ---
 
@@ -199,6 +202,5 @@ Despite encryption and password hashing, users remain vulnerable if:
 * The operating system is compromised.
 * Malware captures credentials during entry.
 * Weak master passwords are chosen.
-* Encryption keys are exposed.
 
 Users should maintain good endpoint security and choose strong master passwords.

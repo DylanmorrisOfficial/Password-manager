@@ -11,6 +11,7 @@ This project is a desktop password manager built with Python, Tkinter, and ttkbo
 The project demonstrates:
 
 * Secure password storage
+* Password-based key derivation
 * Cryptography fundamentals
 * Authentication mechanisms
 * Secure software development practices
@@ -34,12 +35,7 @@ The project demonstrates:
 * Password visibility toggle
 * Secure password generation
 * Desktop GUI built with Tkinter and ttkbootstrap
-
-### Planned
-
 * Master-password-derived encryption keys
-
----
 
 ## Technologies Used
 
@@ -66,11 +62,13 @@ Passwords are never stored in plaintext.
 
 Vault contents are encrypted using Fernet symmetric encryption from the Python `cryptography` package.
 
-Each user's vault is stored in an encrypted file:
+Encryption keys are derived from the user's master password using PBKDF2-HMAC-SHA256 with a unique per-user salt and 100,000 iterations.
 
-```text
+The encryption key is never stored on disk.
+
+Each user's vault is stored as an encrypted file:
+
 vaults/<username>.dat
-```
 
 ### Password Generation
 
@@ -200,7 +198,11 @@ This project uses:
 * Fernet symmetric encryption for vault storage
 * Cryptographically secure password generation via Python's `secrets` module
 
-Current versions store the encryption key separately from the master password. Future versions will derive vault encryption keys directly from the user's master password for improved security.
+Vault encryption keys are derived from the user's master password using PBKDF2-HMAC-SHA256 and a unique per-user salt.
+
+Encryption keys are generated when needed and are not stored on disk.
+
+As a result, possession of the encrypted vault file alone is insufficient to decrypt stored credentials without knowledge of the user's master password.
 
 For a detailed security analysis, see:
 
